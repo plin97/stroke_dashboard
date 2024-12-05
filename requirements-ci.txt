@@ -1,3 +1,4 @@
 wheel
 shiny
 shinylive
+fastparquet
