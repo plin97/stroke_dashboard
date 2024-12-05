@@ -44,16 +44,11 @@ jobs:
           run: |
            shinylive export . _site
 
-        - name: Copy parquet files in
-          shell: bash
-          run: |
-            cp *.parquet _site/
-
         # Upload a tar file that will work with GitHub Pages
         # Make sure to set a retention day to avoid running into a cap
         # This artifact shouldn't be required after deployment onto pages was a success.
         - name: Upload Pages artifact
-          uses: actions/upload-pages-artifact@v2
+          uses: actions/upload-pages-artifact@v3
           with: 
             retention-days: 1
         
@@ -62,4 +57,4 @@ jobs:
         # instead of using `docs/` or the `gh-pages` branch of the repository
         - name: Deploy to GitHub Pages
           id: deployment
-          uses: actions/deploy-pages@v2
+          uses: actions/deploy-pages@v4
