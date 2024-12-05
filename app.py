@@ -28,9 +28,9 @@ def remove_base_case_and_non_diffs(df, remove_base = True, remove_nondiffs = Tru
         # df['sensitivity'] = df['sensitivity'].astype(pd.api.types.CategoricalDtype(categories = ['high', 'mid', 'low'], ordered = True))
     return df
 
-all_data = pd.read_parquet("all_data.parquet")
-psc_data = pd.read_parquet("psc_data.parquet")
-map_data = pd.read_parquet("maps.parquet")
+all_data = pd.read_parquet("./all_data.parquet")
+psc_data = pd.read_parquet("./psc_data.parquet")
+map_data = pd.read_parquet("./maps.parquet")
 
 # Add page title and sidebar
 ui.page_opts(title="Stroke Simulations", fillable=True)
