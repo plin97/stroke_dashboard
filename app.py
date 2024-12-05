@@ -200,6 +200,5 @@ def _():
     )
     ui.update_switch(id = "psc_only", value = False)
     ui.update_numeric(
-        id = 'map_number',
-        value = None
+        id = 'map_number'
     )
