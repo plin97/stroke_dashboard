@@ -11,6 +11,7 @@ import numpy as np
 from scipy.spatial import Voronoi, voronoi_plot_2d
 import matplotlib.pyplot as plt
 import pandas as pd
+from pathlib import Path
 
 def remove_base_case_and_non_diffs(df, remove_base = True, remove_nondiffs = True):
     '''
@@ -28,9 +29,10 @@ def remove_base_case_and_non_diffs(df, remove_base = True, remove_nondiffs = Tru
         # df['sensitivity'] = df['sensitivity'].astype(pd.api.types.CategoricalDtype(categories = ['high', 'mid', 'low'], ordered = True))
     return df
 
-all_data = pd.read_parquet("all_data.parquet")
-psc_data = pd.read_parquet("psc_data.parquet")
-map_data = pd.read_parquet("maps.parquet")
+app_dir = Path(__file__).parent
+all_data = pd.read_parquet(app_dir / "all_data.parquet")
+psc_data = pd.read_parquet(app_dir / "psc_data.parquet")
+map_data = pd.read_parquet(app_dir / "maps.parquet")
 
 # Add page title and sidebar
 ui.page_opts(title="Stroke Simulations", fillable=True)
@@ -199,5 +201,5 @@ def _():
     ui.update_switch(id = "psc_only", value = False)
     ui.update_numeric(
         id = 'map_number',
-        value = -1
+        value = None
     )
