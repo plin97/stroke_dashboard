@@ -42,7 +42,20 @@ jobs:
         - name: Create Python Shinylive App from working directory files
           shell: bash
           run: |
-           shinylive export . _site
+           shinylive export map_visuals _site --subdir map_app
+
+        # Export the current working directory as the py-shiny app
+        # using the version of the py-shinylive package
+        - name: Create Python Shinylive App from working directory files
+          shell: bash
+          run: |
+           shinylive export scenario_visuals _site --subdir scenario_app
+
+        # Copy index.html in to site
+        - name: Copy index.html in
+          shell: bash
+          run: |
+           cp index.html _site/
 
         # Upload a tar file that will work with GitHub Pages
         # Make sure to set a retention day to avoid running into a cap
