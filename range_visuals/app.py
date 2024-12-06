@@ -125,19 +125,6 @@ with ui.layout_columns(col_widths=[4,4,4]):
             #return ax
             return px.line(data, x = 'threshold', y = 'ischemic_patients_diff', color = 'sensitivity', markers = True)
 
-
-    with ui.card(full_screen=True):
-        with ui.card_header(class_="d-flex justify-content-between align-items-center"):
-            "Change in Time to EVT for LVO patients"
-
-            #@render.plot
-        @render_plotly
-        def time_evt_lvo_plot():
-            data = get_data().groupby(['sensitivity','threshold']).mean().reset_index()
-            # ax = sns.lineplot(data, x = 'threshold', y = 'evt_lvo_mean_diff', hue = 'sensitivity', marker = 'o', errorbar = None)
-            # return ax
-            return px.line(data, x = 'threshold', y = 'evt_lvo_mean_diff', color = 'sensitivity', markers= True)
-
         
     with ui.card(full_screen=True):
         with ui.card_header(class_="d-flex justify-content-between align-items-center"):
@@ -150,6 +137,18 @@ with ui.layout_columns(col_widths=[4,4,4]):
             # ax = sns.lineplot(data, x = 'threshold', y = 'lvo_patients_diff', hue = 'sensitivity', marker = 'o', errorbar = None)
             # return ax
             return px.line(data, x = 'threshold', y = 'lvo_patients_diff', color = 'sensitivity', markers = True)
+        
+    with ui.card(full_screen=True):
+        with ui.card_header(class_="d-flex justify-content-between align-items-center"):
+            "Change in Time to EVT for LVO patients"
+
+            #@render.plot
+        @render_plotly
+        def time_evt_lvo_plot():
+            data = get_data().groupby(['sensitivity','threshold']).mean().reset_index()
+            # ax = sns.lineplot(data, x = 'threshold', y = 'evt_lvo_mean_diff', hue = 'sensitivity', marker = 'o', errorbar = None)
+            # return ax
+            return px.line(data, x = 'threshold', y = 'evt_lvo_mean_diff', color = 'sensitivity', markers= True)
 
 
 
