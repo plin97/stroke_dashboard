@@ -61,12 +61,13 @@ with ui.sidebar(open="desktop"):
 
 # Add main content
 ICONS = {
-    "square": fa.icon_svg("square", "regular"),
-    "ruler": fa.icon_svg("ruler")
+    "equipoise": fa.icon_svg("square", "regular"),
+    "geoscale": fa.icon_svg("ruler"),
+    "sc_dist": fa.icon_svg("slash")
 }
 
 with ui.layout_columns(fill=False):
-    with ui.value_box(showcase=ICONS["square"]):
+    with ui.value_box(showcase=ICONS["equipoise"]):
         "Equipoise"
 
         @render.express
@@ -76,7 +77,7 @@ with ui.layout_columns(fill=False):
             else:
                 f'{map_data.loc[map_data['map'] == input.map_number(), 'equipoise'].values.item(0):.3f}'
 
-    with ui.value_box(showcase=ICONS["ruler"]):
+    with ui.value_box(showcase=ICONS["geoscale"]):
         "Map side length"
 
         @render.express
@@ -85,6 +86,16 @@ with ui.layout_columns(fill=False):
                 '--'
             else:
                 f'{map_data.loc[map_data['map'] == input.map_number(), 'geoscale'].values.item(0):.3f}'
+    
+    with ui.value_box(showcase=ICONS["sc_dist"]):
+        "Max normalized distance between SCs"
+
+        @render.express
+        def get_max_dist():
+            if input.map_number() is None or input.map_number() < 0:
+                '--'
+            else:
+                f'{map_data.loc[map_data['map'] == input.map_number(), 'sc_max_dist_normalized'].values.item(0):.3f}'
 
 with ui.layout_columns(col_widths=[6, 6, 6, 6]):
     with ui.card(full_screen=True):
