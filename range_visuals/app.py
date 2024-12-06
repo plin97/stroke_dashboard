@@ -7,9 +7,9 @@ from shiny.express import input, ui
 import plotly.express as px
 from shinywidgets import render_plotly
 
-import numpy as np
-from scipy.spatial import Voronoi, voronoi_plot_2d
-import matplotlib.pyplot as plt
+# import numpy as np
+# from scipy.spatial import Voronoi, voronoi_plot_2d
+# import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
 
