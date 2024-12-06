@@ -49,7 +49,7 @@ jobs:
         - name: Create Python Shinylive App from working directory files
           shell: bash
           run: |
-           shinylive export scenario_visuals _site --subdir scenario_app
+           shinylive export range_visuals _site --subdir range_app
 
         # Copy index.html in to site
         - name: Copy index.html in

@@ -38,6 +38,22 @@ map_data = pd.read_parquet(app_dir / "maps.parquet")
 ui.page_opts(title="Stroke Simulations", fillable=True)
 
 with ui.sidebar(open="desktop"):
+    ui.input_slider(
+        id = 'equipoise_range',
+        label = 'Equipoise range',
+        min = 0,
+        max = 1,
+        value = [0, 1]
+    )
+
+    ui.input_slider(
+        id = 'geoscale_range',
+        label = 'Geoscale range',
+        min = 30,
+        max = 100,
+        value = [30, 100]
+    )
+
     ui.input_checkbox_group(
         "sensitivity",
         "LVO diagnosis sensitivity and specificity",
@@ -48,11 +64,7 @@ with ui.sidebar(open="desktop"):
         "psc_only",
         "Only patients closest to PSC",
         )
-    ui.input_numeric(
-        'map_number',
-        label = 'Map number',
-        value = None
-    )
+    
     ui.input_action_button("reset", "Reset filter")
     ui.input_dark_mode(
         id = 'dark_mode',
@@ -62,67 +74,43 @@ with ui.sidebar(open="desktop"):
 # Add main content
 ICONS = {
     "square": fa.icon_svg("square", "regular"),
-    "ruler": fa.icon_svg("ruler")
+    "ruler": fa.icon_svg("ruler"),
+    "map": fa.icon_svg("map", "regular")
 }
 
 with ui.layout_columns(fill=False):
-    with ui.value_box(showcase=ICONS["square"]):
-        "Equipoise"
+    with ui.value_box(showcase=ICONS["map"]):
+        "Number of maps"
 
         @render.express
-        def get_equipoise():
-            if input.map_number() is None or input.map_number() < 0:
-                '--'
-            else:
-                f'{map_data.loc[map_data['map'] == input.map_number(), 'equipoise'].values.item(0):.3f}'
+        def get_num_maps():
+            get_data()['map'].unique().shape[0]
+
+    with ui.value_box(showcase=ICONS["square"]):
+        "Average equipoise"
+
+        @render.express
+        def get_avg_equipoise():
+            f'{map_data.loc[map_data['map'].isin(get_data()['map'].unique()), 'equipoise'].mean():.3f}'
 
     with ui.value_box(showcase=ICONS["ruler"]):
-        "Map side length"
+        "Average length"
 
         @render.express
-        def get_geoscale():
-            if input.map_number() is None or input.map_number() < 0:
-                '--'
-            else:
-                f'{map_data.loc[map_data['map'] == input.map_number(), 'geoscale'].values.item(0):.3f}'
+        def get_avg_geoscale():
+            f'{map_data.loc[map_data['map'].isin(get_data()['map'].unique()), 'geoscale'].mean():.3f}'
 
-with ui.layout_columns(col_widths=[6, 6, 6, 6]):
-    with ui.card(full_screen=True):
-        ui.card_header("Map visualization")
+#     with ui.value_box(showcase=ICONS["ruler"]):
+#         "Map side length"
 
-        @render.plot
-        def show_map():
-            # return render.DataGrid(get_data())
-            if input.map_number() is None or input.map_number() < 0:
-                return None
-            geoscale, xPSC, yPSC, xPSC2, yPSC2 = map_data.loc[map_data['map'] == input.map_number(), ['geoscale', 'xPSC', 'yPSC', 'xPSC2', 'yPSC2']].values.flatten()
+#         @render.express
+#         def get_geoscale():
+#             if input.map_number() is None or input.map_number() < 0:
+#                 '--'
+#             else:
+#                 f'{map_data.loc[map_data['map'] == input.map_number(), 'geoscale'].values.item(0):.3f}'
 
-            med_coords = np.array([[0.5 * geoscale, 0.5 * geoscale],
-                        [xPSC, yPSC],
-                        [xPSC2, yPSC2]])
-            
-            coord_labels = ['CSC', 'PSC', 'PSC2']
-            voronoi_colors = ['blue', 'green', 'red']
-            voronoi_markers = ['^','o','o']
-
-            distant_coords = np.array([[-8 * geoscale, -8 * geoscale],
-                           [8 * geoscale, 8 * geoscale],
-                           [-8 * geoscale, 9 * geoscale],
-                           [8 * geoscale, -7 * geoscale]])
-
-            full_coords = np.vstack((med_coords, distant_coords))
-            vor = Voronoi(full_coords)
-            voronoi_plot_2d(vor, show_vertices = False, show_points = False)
-            for i, hosp in enumerate(coord_labels):
-                poly = [vor.vertices[j] for j in vor.regions[vor.point_region[i]]]
-                plt.fill(*zip(*poly), color = voronoi_colors[i], alpha = 0.25)
-                plt.scatter(med_coords[i,0], med_coords[i,1], c = voronoi_colors[i], label = hosp, marker = voronoi_markers[i])
-            plt.xlim(0, geoscale)
-            plt.ylim(0, geoscale)
-            plt.legend()
-            plt.gca().set_aspect('equal')
-            return plt.gca()
-            
+with ui.layout_columns(col_widths=[4,4,4]):
 
     with ui.card(full_screen=True):
         with ui.card_header(class_="d-flex justify-content-between align-items-center"):
@@ -130,8 +118,9 @@ with ui.layout_columns(col_widths=[6, 6, 6, 6]):
 
         #@render.plot
         @render_plotly
-        def mRS_ischemic_plot():
+        def mRS_ischemic_plots():
             data = get_data().groupby(['sensitivity','threshold']).mean().reset_index()
+            # data.idxmax()
             # ax = sns.lineplot(data, x = 'threshold', y = 'ischemic_patients_diff', hue = 'sensitivity', marker = 'o', errorbar = None)
             #return ax
             return px.line(data, x = 'threshold', y = 'ischemic_patients_diff', color = 'sensitivity', markers = True)
@@ -183,9 +172,9 @@ def get_data():
         '0.6, 0.9': 'low'
     }
     test_sensitivities = [sensitivity_dict[i] for i in input.sensitivity()]
-    data = data.loc[data['sensitivity'].isin(test_sensitivities), :].copy()
-    if input.map_number() is not None and input.map_number() > 0:
-        data = data.loc[data['map'] == input.map_number(), :].copy()
+    data = data.loc[data['sensitivity'].isin(test_sensitivities), :]
+    map_nums = map_data.loc[(map_data['equipoise'].between(input.equipoise_range()[0], input.equipoise_range()[1])) & (map_data['geoscale'].between(input.geoscale_range()[0], input.geoscale_range()[1])), 'map'].unique()
+    data = data.loc[data['map'].isin(map_nums),:].copy()
     return data
     # lvo_sensivity 
 
@@ -198,7 +187,13 @@ def _():
         id = "sensitivity",
         selected = ["0.9, 0.6", "0.75, 0.75", "0.6, 0.9"]
     )
-    ui.update_switch(id = "psc_only", value = False)
-    ui.update_numeric(
-        id = 'map_number'
+    ui.update_slider(
+        'equipoise_range',
+        value = [0, 1]
     )
+    ui.update_slider(
+        'geoscale_range',
+        value = [30, 100]
+    )
+
+    ui.update_switch(id = "psc_only", value = False)
