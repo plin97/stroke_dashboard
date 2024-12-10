@@ -49,14 +49,14 @@ jobs:
         - name: Create Python Shinylive App from working directory files
           shell: bash
           run: |
-           shinylive export range_visuals _site --subdir range_app
+           shinylive export optimal_visuals _site --subdir optimal_app
 
       # Export the current working directory as the py-shiny app
         # using the version of the py-shinylive package
         - name: Create Python Shinylive App from working directory files
           shell: bash
           run: |
-           shinylive export stroke_sim_dashboard _site --subdir optimal_app
+           shinylive export stroke_sim_dashboard _site --subdir range_app
 
         # Copy overall index.html in to site
         - name: Copy index.html in
