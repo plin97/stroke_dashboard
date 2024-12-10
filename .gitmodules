@@ -1,0 +1,3 @@
+[submodule "stroke_sim_dashboard"]
+	path = stroke_sim_dashboard
+	url = ./stroke_sim_dashboard
